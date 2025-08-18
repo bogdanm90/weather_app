@@ -23,12 +23,6 @@ WEATHER APP
 npm test
 ```
 
-### Unit Tests with UI
-
-```bash
-npm run test:ui
-```
-
 ## 📱 API Endpoints
 
 - **Geocoding**: `https://geocoding-api.open-meteo.com/v1/search`
