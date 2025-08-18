@@ -20,15 +20,31 @@ export default function WeatherCard({
 }: WeatherCardProps) {
   const { current_weather, hourly } = weather;
 
-  const hourlyForecasts = hourly.time
-    .map((time, index) => ({
-      time,
-      temperature: hourly.temperature_2m[index],
-      humidity: hourly.relative_humidity_2m[index],
-      weatherCode: hourly.weathercode[index],
-    }))
-    .filter((_, index) => index % 3 === 0)
-    .slice(1, 4);
+  const now = new Date(current_weather.time);
+  const todayStr = current_weather.time.slice(0, 10);
+
+  let startIndex = hourly.time.findIndex(
+    (t) => new Date(t).getTime() >= now.getTime()
+  );
+  if (startIndex === -1) startIndex = 0;
+
+  const hourlyForecasts = [] as Array<{
+    time: string;
+    temperature: number;
+    humidity: number;
+    weatherCode: number;
+  }>;
+
+  for (let i = startIndex; i < hourly.time.length; i += 2) {
+    const t = hourly.time[i];
+    if (!t.startsWith(todayStr)) break;
+    hourlyForecasts.push({
+      time: t,
+      temperature: hourly.temperature_2m[i],
+      humidity: hourly.relative_humidity_2m[i],
+      weatherCode: hourly.weathercode[i],
+    });
+  }
 
   return (
     <div className={`weather-card p-6 ${className}`}>
@@ -67,21 +83,29 @@ export default function WeatherCard({
           </h3>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {hourlyForecasts.map((forecast, index) => (
-            <div key={index} className="text-center p-3 bg-gray-50 rounded-lg">
-              <div className="text-sm font-medium text-gray-600 mb-2">
-                {formatTime(forecast.time)}
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          <div className="flex snap-x snap-mandatory">
+            {hourlyForecasts.map((forecast, index) => (
+              <div
+                key={index}
+                className="flex-none w-1/3 px-2 snap-start"
+                aria-label={`Forecast for ${formatTime(forecast.time)}`}
+              >
+                <div className="text-center p-3 bg-gray-50 rounded-lg h-full">
+                  <div className="text-sm font-medium text-gray-600 mb-2">
+                    {formatTime(forecast.time)}
+                  </div>
+                  <WeatherIcon weatherCode={forecast.weatherCode} size="lg" />
+                  <div className="text-lg font-semibold text-gray-900 mb-1">
+                    {formatTemperature(forecast.temperature, units)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {forecast.humidity}% humidity
+                  </div>
+                </div>
               </div>
-              <WeatherIcon weatherCode={forecast.weatherCode} size="lg" />
-              <div className="text-lg font-semibold text-gray-900 mb-1">
-                {formatTemperature(forecast.temperature, units)}
-              </div>
-              <div className="text-xs text-gray-500">
-                {forecast.humidity}% humidity
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
