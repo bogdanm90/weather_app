@@ -8,7 +8,9 @@ export default function AppProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      {import.meta.env.DEV && <ReactQueryDevtools position="bottom-right" />}
+      {import.meta.env.DEV && (
+        <ReactQueryDevtools buttonPosition="bottom-right" />
+      )}
     </QueryClientProvider>
   );
 }

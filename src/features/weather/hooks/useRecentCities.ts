@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { safeGet, safeSet } from '@/lib/storage';
 import { City } from '../api/types';
 
